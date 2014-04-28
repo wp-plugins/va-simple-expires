@@ -34,6 +34,11 @@ The description covers it all.
 2. ScreenShot 2.
 
 == Changelog ==
+
+= 1.0.1 =
+* Change The Readme text.
+There is no change to the program file.
+
 = 1.0.0 =
 * First public release.
 
