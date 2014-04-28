@@ -12,8 +12,8 @@ Simple plugin which can set up the term of validity.
 
 == Description ==
 
-This is the fork of Simple Expires created by Mr. abmcr.
-Simple plugin which can set up the term of validity.
+VA Simple Expires is a plugin that allows you to add an expiration date to posts.
+The usage is pretty simple. You define an expiration date to a post and when the date comes, the post is removed from the public side of your site and set to "expiration". "Expiration" is a new post status added by the plugin.
 
 == Installation ==
 
