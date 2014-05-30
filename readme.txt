@@ -35,11 +35,17 @@ The description covers it all.
 
 == Changelog ==
 
+= 1.0.3 =
+* Bug fix.
+
+Fixed a bug that Meta data that you created in wp-types did not take over.
+
 = 1.0.2 =
 * Bug fix.
 
 = 1.0.1 =
 * Change The Readme text.
+
 There is no change to the program file.
 
 = 1.0.0 =

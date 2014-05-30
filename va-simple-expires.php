@@ -6,7 +6,7 @@ Plugin URI: https://github.com/VisuAlive/va-simple-expires
 Description: This is the fork of Simple Expires created by Mr. abmcr.
 Simple plugin which can set up the term of validity.
 Author: KUCKLU
-Version: 1.0.2
+Version: 1.0.3
 Author URI: http://visualive.jp/
 Text Domain: va-simple-expires
 Domain Path: /languages
@@ -118,13 +118,16 @@ jQuery(document).ready(function($){
 		", current_time("mysql") ) );
 		// Act upon the results
 		if ( ! empty( $result ) ) :
+			$update_post = array();
 			// Proceed with the updating process
 			// step through the results
 			foreach ( $result as $cur_post ) :
-				$update_post = array('ID' => $cur_post->post_id);
+				$update_post['ID'] = $cur_post->post_id;
 				// Get the Post's ID into the update array
 				$update_post['post_status'] = 'expiration';
+				remove_action( 'simple_expires','save_post' );
 				wp_update_post( $update_post );
+				add_action( 'simple_expires','save_post' );
 			endforeach;
 		endif;
 	}
