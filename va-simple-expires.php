@@ -6,7 +6,7 @@ Plugin URI: https://github.com/VisuAlive/va-simple-expires
 Description: This is the fork of Simple Expires created by Mr. abmcr.
 Simple plugin which can set up the term of validity.
 Author: KUCKLU
-Version: 1.0.3
+Version: 1.0.4
 Author URI: http://visualive.jp/
 Text Domain: va-simple-expires
 Domain Path: /languages
@@ -28,31 +28,71 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-if ( ! class_exists( 'VA_Simple_Expires' ) ) :
-define( 'VA_SIMPLE_EXPIRES_PLUGIN_URL', plugin_dir_url(__FILE__) );
+define( 'VA_SIMPLE_EXPIRES_PLUGIN_URL',  plugin_dir_url(__FILE__) );
 define( 'VA_SIMPLE_EXPIRES_PLUGIN_PATH', plugin_dir_path(__FILE__) );
-define( 'VA_SIMPLE_EXPIRES_DOMAIN', dirname(plugin_basename(__FILE__)) );
-define( 'VA_SIMPLE_EXPIRES_TEXTDOMAIN', 'va-simple-expires' );
+define( 'VA_SIMPLE_EXPIRES_DOMAIN',      dirname( plugin_basename(__FILE__) ) );
+define( 'VA_SIMPLE_EXPIRES_TEXTDOMAIN',  'va-simple-expires' );
 
-class VA_Simple_Expires {
-	function __construct() {
-		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
-		add_action( 'admin_menu', array( $this, 'loadAdmin' ) );
-		add_action( 'admin_head', array( $this, 'add_post_status' ) );
-		add_action( 'init', array( $this, 'simple_expires' ) );
-		add_action( 'add_meta_boxes', array( $this, 'scadenza_add_custom_box' ) );
-		add_action( 'save_post', array( $this, 'scadenza_save_postdata' ) );
+/**
+ * Ran plugin.
+ */
+if ( !function_exists( 'va_simple_expires_setup' ) ) :
+	function va_simple_expires_setup() {
+		if ( !class_exists( 'VA_SIMPLE_EXPIRES_SETUP' ) ) {
+			class VA_SIMPLE_EXPIRES_SETUP extends _VA_SIMPLE_EXPIRES {
+				protected function __construct() {
+					parent::__construct();
+				}
+			}
+		}
+
+		$va_simple_expires = VA_SIMPLE_EXPIRES_SETUP::instance();
+	}
+endif; // va_simple_expires_setup
+add_action( 'plugins_loaded', 'va_simple_expires_setup' );
+
+/**
+ * Class _VA_SIMPLE_EXPIRES
+ */
+class _VA_SIMPLE_EXPIRES {
+	/**
+	 * Holds the singleton instance of this class
+	 *
+	 * @var array
+	 */
+	private static $instances = false;
+
+	/**
+	 * Instance
+	 *
+	 * @return self
+	 */
+	public static function instance(){
+		if( !self::$instances ) {
+			self::$instances = new _VA_SIMPLE_EXPIRES;
+		}
+
+		return self::$instances;
 	}
 
-	function deactivation() {
+	/**
+	 * This hook is called once any activated plugins have been loaded.
+	 */
+	protected function __construct() {
+		load_plugin_textdomain( VA_SIMPLE_EXPIRES_TEXTDOMAIN, false, VA_SIMPLE_EXPIRES_DOMAIN .'/languages' );
+
+		add_action( 'plugins_loaded', array( &$this, 'plugins_loaded' )          );
+		add_action( 'admin_menu',     array( &$this, 'loadAdmin' )               );
+		add_action( 'admin_head',     array( &$this, 'add_post_status' )         );
+		add_action( 'init',           array( &$this, 'simple_expires' )          );
+		add_action( 'add_meta_boxes', array( &$this, 'scadenza_add_custom_box' ) );
+		add_action( 'save_post',      array( &$this, 'scadenza_save_postdata' )  );
+	}
+
+	public function deactivation() {
 		//  remove rows from wp_postmeta tables
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->postmeta WHERE meta_key='scadenza-enable' OR meta_key='scadenza-date'" ) );
-	}
-
-	function plugins_loaded() {
-		load_plugin_textdomain( VA_SIMPLE_EXPIRES_TEXTDOMAIN, false, VA_SIMPLE_EXPIRES_DOMAIN .'/languages' );
 	}
 
 	function loadAdmin() {
@@ -62,6 +102,7 @@ class VA_Simple_Expires {
 	private function va_se_get_post_types() {
 		$default_post = array('post' => 'post', 'page' => 'page');
 		$custom_post  = get_post_types( array( 'public' => true, '_builtin' => false ), 'names' );
+
 		return array_merge( $default_post, $custom_post );
 	}
 
@@ -256,6 +297,4 @@ jQuery(document).ready(function($){
 		update_post_meta( $post_id, 'scadenza-enable', $enabled );
 		return $mydata;
 	}
-} // class VA_Simple_Expires
-new VA_Simple_Expires;
-endif;
+} // class _VA_SIMPLE_EXPIRES
